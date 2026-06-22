@@ -24,8 +24,8 @@ const emptyState       = document.getElementById('emptyState');
 const previewSubtotal  = document.getElementById('previewSubtotal');
 const previewAmount    = document.getElementById('previewAmount');
 
-var compras = [];
-var filtroActivo = 'all';
+const compras = [];
+let filtroActivo = 'all';
 
 const inventario = {
   vip:     { precio: 5000, stock: 10, vendidas: 0 },
@@ -41,14 +41,14 @@ function registrarCompra(evento) {
 
   const nombre = inputNombre.value.trim();
   const tipo   = selectTipo.value;
-  const cantidad = parseInt(inputCantidad.value, 10);
+  const cantidad = Number.parseInt(inputCantidad.value, 10);
 
   if (nombre === '' || tipo === '' || inputCantidad.value === '') {
     mensajeError.textContent = 'Todos los campos son obligatorios.';
     return;
   }
 
-  if (isNaN(cantidad) || cantidad <= 0) {
+  if (Number.isNaN(cantidad) || cantidad <= 0) {
     mensajeError.textContent = 'La cantidad debe ser un número entero mayor a 0.';
     return;
   }
@@ -132,8 +132,8 @@ function actualizarContadores() {
 // ─── Vista previa del subtotal ────────────────────────────────────────────────
 function actualizarPreview() {
   const tipo = selectTipo.value;
-  const cantidad = parseInt(inputCantidad.value, 10);
-  if (tipo && !isNaN(cantidad) && cantidad > 0 && inventario[tipo]) {
+  const cantidad = Number.parseInt(inputCantidad.value, 10);
+  if (tipo && !Nunber.isNaN(cantidad) && cantidad > 0 && inventario[tipo]) {
     const subtotal = cantidad * inventario[tipo].precio;
     previewAmount.textContent = formatearPesos(subtotal);
     previewSubtotal.classList.remove('d-none');
@@ -142,14 +142,9 @@ function actualizarPreview() {
   }
 }
 
-function generarRotacionVip() {
-  const rotacion = (Math.random() * 6 - 3).toFixed(2);
-  return rotacion;
-}
-
-function generarRotacionGeneral() {
-  const rotacion = (Math.random() * 4 - 2).toFixed(2);
-  return rotacion;
+function generarRotacion() {
+  const randomSeguro = crypto.getRandomValues(new Uint32Array(1))[0] / 4294967296;
+  return (randomSeguro * 4 - 2).toFixed(2);
 }
 
 // ─── Formateo de pesos CLP ────────────────────────────────────────────────────
@@ -172,13 +167,11 @@ function cambiarFiltro(nuevoFiltro) {
 
   actualizarTabla();
   actualizarContadores();
-  return;
   const resumen = compras.length + ' compras registradas.';
   console.log(resumen);
 }
 
 
-// TODO: agregar funcionalidad para exportar el historial de compras a CSV.
 // ─── Binding de eventos ───────────────────────────────────────────────────────
 form.addEventListener('submit', registrarCompra);
 
